@@ -6,7 +6,8 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Avatar from "@material-ui/core/Avatar";
-import { Typography } from "@material-ui/core";
+import UnfoldMoreIcon from '@material-ui/icons/UnfoldMore';
+import { Box, Typography } from "@material-ui/core";
 
 import moment from "moment";
 
@@ -17,15 +18,26 @@ const useStyles = makeStyles({
     minWidth: 650,
     marginTop: 15,
   },
+  head: {
+    backgroundColor: '#ebebeb',
+  },
+  sort: {
+    cursor: 'pointer',
+  }
 });
 
-const ContactTable = ({ data }) => {
+const ContactTable = ({ data, sort }) => {
   const classes = useStyles();
+
+  const deletSymbolPhone = str => {
+    const regex = /\d/g;
+    return str.match(regex).join('');
+  }
 
   return (
     <TableContainer>
-      <Table className={classes.table} aria-label="caption table">
-        <TableHead>
+      <Table className={classes.table} aria-label="table">
+        <TableHead className={classes.head}>
           <TableRow>
             <TableCell>Avatar</TableCell>
             <TableCell>Name</TableCell>
@@ -33,7 +45,7 @@ const ContactTable = ({ data }) => {
             <TableCell>Email</TableCell>
             <TableCell>Phone</TableCell>
             <TableCell>Location</TableCell>
-            <TableCell align="right">Nationality</TableCell>
+            <TableCell onClick={() => {sort('nat')}} align="right"><Box display="flex">Nationality <UnfoldMoreIcon className={classes.sort} color="disabled"/></Box></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -52,7 +64,7 @@ const ContactTable = ({ data }) => {
               <TableCell>
                 <ClickBoard text={item.email} />
               </TableCell>
-              <TableCell><ClickBoard text={item.phone} /></TableCell>
+              <TableCell><ClickBoard text={deletSymbolPhone(item.phone)} /></TableCell>
               <TableCell>{item.location.country}</TableCell>
               <TableCell align="right">{item.nat}</TableCell>
             </TableRow>
