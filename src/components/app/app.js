@@ -1,7 +1,13 @@
 import React from "react";
-import { IconButton, Container, Grid, Paper, Typography } from "@material-ui/core";
+import {
+  IconButton,
+  Container,
+  Grid,
+  Paper,
+  Typography,
+} from "@material-ui/core";
 import Pagination from "@material-ui/lab/Pagination";
-import CachedRoundedIcon from '@material-ui/icons/CachedRounded';
+import CachedRoundedIcon from "@material-ui/icons/CachedRounded";
 import { makeStyles } from "@material-ui/core/styles";
 
 import { ContactTable, Spinner } from "../";
@@ -9,7 +15,7 @@ import { ContactTable, Spinner } from "../";
 const useStyles = makeStyles({
   header: {
     display: "flex",
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   btn: {
     padding: 0,
@@ -28,8 +34,8 @@ const useStyles = makeStyles({
   },
   box: {
     display: "flex",
-    maxWidth: '30%',
-    justifyContent: 'space-between',
+    maxWidth: "30%",
+    justifyContent: "space-between",
   },
 });
 
@@ -40,7 +46,7 @@ const App = () => {
   const [error, setError] = React.useState(null);
   const [currentPage, setCurrentPage] = React.useState(1);
   const [usersPerPage] = React.useState(10);
-  const [sortType, setSortType] = React.useState("asc");
+  const [sortType, setSortType] = React.useState(true);
 
   React.useEffect(() => {
     const getContacts = async () => {
@@ -68,71 +74,78 @@ const App = () => {
 
   const sortBy = (field) => {
     const sortedContacts = [...data];
-    const sortByFieldAsc = (key) => (a, b) =>
-      a[key] > b[key] ? 1 : b[key] > a[key] ? -1 : 0;
+    const sortByFieldAsc = (key) => (a, b) => a[key] > b[key] ? 1 : -1 ;
 
     const sortedData = sortedContacts.sort(sortByFieldAsc(field));
-    const arrContacts = sortType === "asc" ? sortedData : sortedData.reverse();
+    
+    const arrContacts = sortType ? sortedData : sortedData.reverse();
     setData(arrContacts);
+    setSortType(!sortType);
   };
 
-  const genderCount = obj =>{
-    const male = obj.reduce((sum, item) => sum + (item.gender === 'male'), 0);
-    return {male, female: obj.length - male}
-  }
+  const genderCount = obj => {
+    const male = obj.reduce((sum, item) => sum + (item.gender === "male"), 0);
+    return { male, female: obj.length - male };
+  };
 
   const genderCountResult = genderCount(data);
 
-  const reloadPage = () => {
-    window.location.reload(false);
-  };
+  const reloadPage = () => window.location.reload(false);
 
   return (
     <Container>
       <Grid>
-        <Grid className={classes.header}>
-          <Typography variant="h3">Contacts</Typography>
-          <IconButton onClick={reloadPage}><CachedRoundedIcon /></IconButton>
-        </Grid>
-        <Grid className={classes.main}>
-          {isLoaded ? <Spinner /> : <ContactTable data={data} sort={sortBy} />}
-          {data.length > 0 && (
-            <Pagination
-              className={classes.pagination}
-              count={usersPerPage}
-              page={currentPage}
-              onChange={handleChange}
-              color="primary"
-            />
-          )}
-        </Grid>
-        <Grid>
-          {data.length > 0 && (
-            <Paper className={classes.statistic}>
-              <Grid>
+        {isLoaded ? (
+          <Spinner />
+        ) : (
+          <>
+            <Grid className={classes.header}>
+              <Typography variant="h3">Contacts</Typography>
+              <IconButton onClick={reloadPage}>
+                <CachedRoundedIcon />
+              </IconButton>
+            </Grid>
+            <Grid className={classes.main} item>
+              <ContactTable data={data} sort={sortBy} />
+              <Pagination
+                className={classes.pagination}
+                count={usersPerPage}
+                page={currentPage}
+                onChange={handleChange}
+                color="primary"
+              />
+            </Grid>
+            <Grid>
+              <Paper className={classes.statistic}>
                 <Grid>
-                  <Typography variant="h5">Statistic</Typography>
-                </Grid>
-                <Grid className={classes.box}>
-                  <Grid item>
-                    <Typography color="textSecondary">Quantity</Typography>
-                    <Typography variant="h6">{data.length}</Typography>
+                  <Grid>
+                    <Typography variant="h5">Statistic</Typography>
                   </Grid>
+                  <Grid className={classes.box}> 
+                    <Grid>
+                      <Typography color="textSecondary">Quantity</Typography>
+                      <Typography variant="h6">{data.length}</Typography>
+                    </Grid>
 
-                  <Grid item>
-                    <Typography color="textSecondary">Males</Typography>
-                    <Typography variant="h6">{genderCountResult.male}</Typography>
-                  </Grid>
+                    <Grid>
+                      <Typography color="textSecondary">Males</Typography>
+                      <Typography variant="h6">
+                        {genderCountResult.male}
+                      </Typography>
+                    </Grid>
 
-                  <Grid item>
-                    <Typography color="textSecondary">Females</Typography>
-                    <Typography variant="h6">{genderCountResult.female}</Typography>
+                    <Grid>
+                      <Typography color="textSecondary">Females</Typography>
+                      <Typography variant="h6">
+                        {genderCountResult.female}
+                      </Typography>
+                    </Grid>
                   </Grid>
                 </Grid>
-              </Grid>
-            </Paper>
-          )}
-        </Grid>
+              </Paper>
+            </Grid>
+          </>
+        )}
       </Grid>
     </Container>
   );
